@@ -1,25 +1,104 @@
 services:
-  ctfd:
+  ctfd2022:
     build: .
     user: root
     restart: always
     ports:
-      - "8000:8000"
+      - "8022:8000"
     environment:
+      - SECRET_KEY=<key 1>
       - UPLOAD_FOLDER=/var/uploads
-      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db/ctfd
-      - REDIS_URL=redis://cache:6379
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db2022/ctfd
+      - REDIS_URL=redis://cache2022:6379
       - WORKERS=1
       - LOG_FOLDER=/var/log/CTFd
       - ACCESS_LOG=-
       - ERROR_LOG=-
       - REVERSE_PROXY=true
     volumes:
-      - .data/CTFd/logs:/var/log/CTFd
-      - .data/CTFd/uploads:/var/uploads
+      - .data2022/CTFd/logs:/var/log/CTFd
+      - .data2022/CTFd/uploads:/var/uploads
       - .:/opt/CTFd:ro
     depends_on:
-      - db
+      - db2022
+    networks:
+        default:
+        internal:
+
+  ctfd2023:
+    build: .
+    user: root
+    restart: always
+    ports:
+      - "8023:8000"
+    environment:
+      - SECRET_KEY=<key 2>
+      - UPLOAD_FOLDER=/var/uploads
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db2023/ctfd
+      - REDIS_URL=redis://cache2023:6379
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
+    volumes:
+      - .data2023/CTFd/logs:/var/log/CTFd
+      - .data2023/CTFd/uploads:/var/uploads
+      - .:/opt/CTFd:ro
+    depends_on:
+      - db2023
+    networks:
+        default:
+        internal:
+
+  ctfd2024:
+    build: .
+    user: root
+    restart: always
+    ports:
+      - "8024:8000"
+    environment:
+      - SECRET_KEY=<key 3>
+      - UPLOAD_FOLDER=/var/uploads
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db2024/ctfd
+      - REDIS_URL=redis://cache2024:6379
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
+    volumes:
+      - .data2024/CTFd/logs:/var/log/CTFd
+      - .data2024/CTFd/uploads:/var/uploads
+      - .:/opt/CTFd:ro
+    depends_on:
+      - db2024
+    networks:
+        default:
+        internal:
+
+  ctfd2025:
+    build: .
+    user: root
+    restart: always
+    ports:
+      - "8025:8000"
+    environment:
+      - SECRET_KEY=<key 4>
+      - UPLOAD_FOLDER=/var/uploads
+      - DATABASE_URL=mysql+pymysql://ctfd:ctfd@db2025/ctfd
+      - REDIS_URL=redis://cache2025:6379
+      - WORKERS=1
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+      - REVERSE_PROXY=true
+    volumes:
+      - .data2025/CTFd/logs:/var/log/CTFd
+      - .data2025/CTFd/uploads:/var/uploads
+      - .:/opt/CTFd:ro
+    depends_on:
+      - db2025
     networks:
         default:
         internal:
@@ -29,12 +108,18 @@ services:
     restart: always
     volumes:
       - ./conf/nginx/http.conf:/etc/nginx/nginx.conf
+      - ./conf/nginx/fullchain.pem:/certificates/fullchain.pem:ro
+      - ./conf/nginx/privkey.pem:/certificates/privkey.pem:ro
     ports:
       - 80:80
+      - 443:443
     depends_on:
-      - ctfd
+      - ctfd2022
+      - ctfd2023
+      - ctfd2024
+      - ctfd2025
 
-  db:
+  db2022:
     image: mariadb:10.11
     restart: always
     environment:
@@ -44,17 +129,89 @@ services:
       - MARIADB_DATABASE=ctfd
       - MARIADB_AUTO_UPGRADE=1
     volumes:
-      - .data/mysql:/var/lib/mysql
+      - .data2022/mysql:/var/lib/mysql
     networks:
         internal:
     # This command is required to set important mariadb defaults
     command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
 
-  cache:
+  db2023:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=ctfd
+      - MARIADB_USER=ctfd
+      - MARIADB_PASSWORD=ctfd
+      - MARIADB_DATABASE=ctfd
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - .data2023/mysql:/var/lib/mysql
+    networks:
+        internal:
+    # This command is required to set important mariadb defaults
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+
+  db2024:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=ctfd
+      - MARIADB_USER=ctfd
+      - MARIADB_PASSWORD=ctfd
+      - MARIADB_DATABASE=ctfd
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - .data2024/mysql:/var/lib/mysql
+    networks:
+        internal:
+    # This command is required to set important mariadb defaults
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+
+  db2025:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=ctfd
+      - MARIADB_USER=ctfd
+      - MARIADB_PASSWORD=ctfd
+      - MARIADB_DATABASE=ctfd
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - .data2025/mysql:/var/lib/mysql
+    networks:
+        internal:
+    # This command is required to set important mariadb defaults
+    command: [mysqld, --character-set-server=utf8mb4, --collation-server=utf8mb4_unicode_ci, --wait_timeout=28800, --log-warnings=0]
+
+  cache2022:
     image: redis:4
     restart: always
     volumes:
-    - .data/redis:/data
+    - .data2022/redis:/data
+    networks:
+        internal:
+
+  cache2023:
+    image: redis:4
+    restart: always
+    volumes:
+    - .data2023/redis:/data
+    networks:
+        internal:
+
+  cache2024:
+    image: redis:4
+    restart: always
+    volumes:
+    - .data2024/redis:/data
+    networks:
+        internal:
+
+  cache2025:
+    image: redis:4
+    restart: always
+    volumes:
+    - .data2025/redis:/data
     networks:
         internal:
 
