@@ -32,6 +32,7 @@ flask db upgrade
 echo "Starting CTFd"
 exec gunicorn 'CTFd:create_app()' \
     --bind '0.0.0.0:8000' \
+    --timeout 3600 \
     --workers $WORKERS \
     --worker-tmp-dir "$WORKER_TEMP_DIR" \
     --worker-class "$WORKER_CLASS" \
